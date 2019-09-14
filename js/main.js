@@ -9,16 +9,22 @@ const xPosition = 100;
 let svg = d3.select("body").append("svg")
     .attr("width", svgWidth).attr("height", svgHeight);
 let doorGroup = svg.append("g");
-let wallGroup = svg.append("g").attr("transform", "translate(" + doorWidth + ",0)");
+let wallGroupSVG = svg.append("g").attr("transform", "translate(" + doorWidth + ",0)");
+let wallGroupDiv = d3.select("body").append("g");
+let controlOverlayDiv = d3.select("body").append("div")
+    .attr("class", "overlay")
+    .text("Hi");
 
-wallGroup.append("rect")
+wallGroupSVG.append("rect")
     .attr("width", wallWidth)
     .attr("height", wallHeight)
     .attr("fill", "#f1f1f1")
 
-let background = wallGroup.append('image')
+let background = wallGroupSVG.append('image')
     .attr('xlink:href', 'images/background.jpg')
     .attr('width', 200)
     .attr('height', 400)
 .attr("transform", "translate(100, 300)");
 
+
+controlGroup.append("div").attr("class", "inner").append("p");
