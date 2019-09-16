@@ -1,5 +1,5 @@
 # Elevator
-Demo:  https://nnhuyen.github.io/HCI-HW1-Elevator/
+Demo:  https://nnhuyen.github.io/HCI-HW1-Elevator/demo.html
 
 The elevator in the ECE building: 
 ![Elevator_Image_Huyen](/images/example.jpg)
