@@ -18,29 +18,38 @@
 
     const wallWidth = 700;
     const wallHeight = 1000;
-    const doorWidth = 700;
+    const doorWidth = 500;
     const doorHeight = 1000;
     const svgWidth = doorWidth + wallWidth;
     const svgHeight = 1000;
     const xPosition = 100;
-    const floors = ["3", "2", "1", "B"];
+    const floors = [3, 2, 1, 0];
     const info = ["CS labs", "CS office", "Enginneering center", "IT central"]
 
+    const lowerInfo = ["Open", "Close", "Alarm"]
     const main = "#mainContent"
+    
+    const door = {
+        color: "#505050"
+    }
     const button = {
-        r: 13,
+        r: 16,
         x: 100,
         y: function (d, i) {
             return 40 + 70*i
         },
         width: 60,
-        height: 36,
-        color: "#cce2e4",
+        height: 35,
+        color: "#266786",
         hoverColor: "rgba(5,221,224,0.7)",
-        circleColor: "#018592",
-        circleRadius: 15,
-        textStroke: "#2e7c9e",
+        circleColor: "transparent",
+        circleRadius: 16,
+        circleStrokeColor: "#49c4ff",
+        textStroke: "#3896bf",
         fontSize: 17,
+        strokeWidth: 2,
+
+        highlightColor: "#2daf94"
     }
 
     const indicator = {
@@ -68,20 +77,38 @@
 
     const screen = {
         width: 300,
-        height: 450,
+        height: 420,
         color: "#414141"
+    }
+    
+    const lower = {
+        x: (d,i) =>  button.x + 90*i,
+        imgSize: 25,
     }
     let svg = d3.select(main).append("svg")
         .attr("width", svgWidth).attr("height", svgHeight);
+    
+    let currentFloor;
+    let doorOpen = false;
 
     // ───────────────── DIVIDE SECTIONS ──────────────────
-
+    let doorSVG = svg.append("g");
+    
     let wallGroupSVG = svg.append("g")
         .attr("transform", "translate(" + doorWidth + ",0)")
         .attr("id", "wallGroupSVG");
 
     let indicatorSVG = svg.append("g")
 
+    // ───────────────── Door ──────────────────
+    doorSVG.append("rect")
+        .attr("id", "door")
+        .attr("width", doorWidth)
+        .attr("height", doorHeight)
+        .attr("fill", door.color)
+        .attr("x", 0)
+        
+    
     // ───────────────── ON THE WALL ──────────────────
 
     // back wall
@@ -97,8 +124,7 @@
         .attr("height", wallHeight)
         .attr("fill", "#e1e1e1")
 
-    // ───────────────────────────────────────────────────────────────
-    // ────────────────────────── Indicator ──────────────────────────
+    // ────────────────────────── I N D I C A T O R ──────────────────────────
 
     indicatorSVG.append("rect")
         .attr("width", doorWidth)
@@ -140,7 +166,7 @@
 
     indicatorGroup.append("text")
         .attr("id", "indicatorText")
-        .text("1")
+        .text(currentFloor)
         .attr("font-size", indicator.textSize)
         .attr("class", "customFont")
         .attr("fill", indicator.textColor)
@@ -151,7 +177,8 @@
     // ────────────────────────────────────────────────────────────────────────
     // ────────────────────────── Main CONTROL PANEL ──────────────────────────
 
-    let controlPanel = wallGroupSVG.append("g").attr("transform", "translate(80, 270)");
+    let controlPanel = wallGroupSVG.append("g")
+        .attr("id", "controlPanel").attr("transform", "translate(80, 270)");
 
     let screengroup = controlPanel.append("g").attr("transform", "translate(70,0)");
 
@@ -171,6 +198,7 @@
         .enter()
         .append("rect")
         .attr("class", (d,i) => "rectButton button_" + i)
+        .attr("id", (d,i) => "button_" + i)
         .attr("rx", button.r)
         .attr("ry", button.r)
         .attr("x", button.x)
@@ -178,13 +206,17 @@
         .attr("fill", button.color)
         .attr("width", button.width)
         .attr("height", button.height)
-        .on("mouseover", function (d) {
-            d3.select(this).transition().duration(200)
-                .attr("fill", button.hoverColor)
-        })
-        .on("mouseleave", function (d) {
-            d3.select(this).transition().duration(200)
-                .attr("fill", button.color)
+        // .on("mouseover", function (d) {
+        //     d3.select(this).transition().duration(200)
+        //         .attr("fill", button.hoverColor)
+        // })
+        // .on("mouseleave", function (d) {
+        //     d3.select(this).transition().duration(200)
+        //         .attr("fill", button.color)
+        // })
+        .on("click", function(d,i){
+            highlightButton("button_" + i, 1000)
+            setTimeout(closeDoor, 1000)
         });
 
     controlPanel.selectAll(".circleOnButton")
@@ -197,6 +229,8 @@
         .attr("cy", button.y)
         .attr("fill", button.circleColor)
         .attr("fill-opacity", 0.9)
+        .attr("stroke", button.circleStrokeColor)
+        .attr("stroke-width", button.strokeWidth)
         // .attr("stroke", button.color)
         // .attr("stroke-width", )
         .attr("transform", "translate("+ (button.width - button.circleRadius - 3) + ","+ (button.height/2) +")");
@@ -208,7 +242,7 @@
         .attr("class", "textOnButton")
         .attr("x", button.x)
         .attr("y", button.y)
-    .text(d => d)
+    .text(d => d ? d : "B")
     .attr("fill", "white")
         .attr("transform", "translate("+ (button.width - button.circleRadius - 10)+ ",25)")
         .attr("font-size", button.fontSize)
@@ -250,11 +284,119 @@
         .attr("fill", line.color)
         .attr("alignment-baseline", d => d.length > 15? "inherit" : "middle");
 
+    // ────────────────────────── D O W N  B U T T O N  ──────────────────────────
 
+    let lowerGroup = controlPanel.append("g")
+        .attr("id", "lowerGroup")
+        .attr("transform", "translate(0,300)");
+    
+    lowerGroup.selectAll(".lowerButton")
+        .data(lowerInfo)
+        .enter()
+        .append("rect")
+        .attr("id", (d,i) => "button_" + d)
+        .attr("rx", button.r)
+        .attr("ry", button.r)
+        .attr("x", lower.x)
+        .attr("y", 40)
+        .attr("fill", button.color)
+        .attr("width", button.width)
+        .attr("height", button.height)
+        // .on("mouseover", function (d) {
+        //     d3.select(this).transition().duration(200)
+        //         .attr("fill", button.hoverColor)
+        // })
+        // .on("mouseleave", function (d) {
+        //     d3.select(this).transition().duration(200)
+        //         .attr("fill", button.color)
+        // });
+
+    lowerGroup.selectAll(".lowerInfo")
+        .data(lowerInfo)
+        .enter()
+        .append("text")
+        .attr("class", "lowerInfo" )
+        .attr("x", lower.x)
+        .attr("y", 30)
+        .text(d => d)
+        .attr("transform", "translate(8,0)")
+        .attr("fill", line.color)
+        .attr("alignment-baseline", d => d.length > 15? "inherit" : "middle");
+
+    lowerGroup.selectAll(".circleLower")
+        .data(lowerInfo)
+        .enter()
+        .append("circle")
+        .attr("r", button.circleRadius)
+        .attr("cx", lower.x)
+        .attr("cy", 40)
+        .attr("fill", button.circleColor)
+        .attr("fill-opacity", 0.9)
+        .attr("stroke", button.circleStrokeColor)
+        .attr("stroke-width", button.strokeWidth)
+        // .attr("stroke", button.color)
+        // .attr("stroke-width", )
+        .attr("transform", "translate("+ (button.width - button.circleRadius - 3) + ","+ (button.height/2) +")");
+
+    lowerGroup
+        .selectAll(".imageLower")
+        .data(lowerInfo)
+        .enter()
+        .append('image')
+        .attr("class", "imageLower")
+        .attr('xlink:href', (d,i) =>  'images/' + d + '.png')
+        .attr('height', lower.imgSize)
+        .attr("transform", (d,i) => "translate("+ (30 + button.x + 90*i) +", 45)")
+
+    // ────────────────────────── I N T E R A C T I O N  ──────────────────────────
+    d3.select("#button_Open")
+        .on("click", function () {
+            openDoor();
+            highlightButton("#button_Open", 2000)
+        })
+
+    d3.select("#button_Close")
+        .on("click", function () {
+            closeDoor();
+            highlightButton("#button_Close", 2000)
+        })
+    
+    function closeDoor(){
+        d3.select("#door").transition().duration(2000)
+            .attr("x", 0)
+    }
+    
+    function openDoor(){
+        d3.select("#door").transition().duration(2000)
+            .attr("x", doorWidth)
+    }
+    
     for (let i = 0; i < floors.length; i++){
         let selection = d3.selectAll(".button_" + i);
 
         let prevColor = selection.attr("fill")
+    }
+    
+    function travel(currentFloor, destination){
+        let c = parseInt(currentFloor);
+        let d = parseInt(destination);
+        
+        if (c < d){
+        
+        }
+        else if (c > d){
+        
+        }
+        else {
+        
+        }
+    }
+    
+    function highlightButton(id, time){
+        d3.select(id).transition().duration(300).attr("fill", button.highlightColor);
+        setTimeout(function () {
+            d3.select(id).transition().duration(300).attr("fill", button.color);
+        }, time)
     }
 </script>
 </body>
