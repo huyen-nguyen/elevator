@@ -78,14 +78,20 @@
 
     const screen = {
         width: 300,
-        height: 420,
-        color: "#414141"
+        height: 400,
+        color: "#020328",
+        bgcolor: "#777777"
     }
     
     const lower = {
         x: (d,i) =>  button.x + 90*i,
         imgSize: 25,
     }
+
+    const dotPosition = function (i){
+        return 230 - 70*i
+    }
+    
     let svg = d3.select(main).append("svg")
         .attr("width", svgWidth).attr("height", svgHeight);
     
@@ -179,22 +185,48 @@
 
     // ────────────────────────────────────────────────────────────────────────
     // ────────────────────────── Main CONTROL PANEL ──────────────────────────
-
+    
+    let screengroup = wallGroupSVG.append("g").attr("transform", "translate(150,"+panelPositionY+")");
+    
     let controlPanel = wallGroupSVG.append("g")
         .attr("id", "controlPanel").attr("transform", "translate(80,"+panelPositionY+")");
 
-    let screengroup = controlPanel.append("g").attr("transform", "translate(70,0)");
-
+    screengroup.append("rect")
+        .attr('width', screen.width + 15)
+        .attr('height', screen.height + 15)
+        .attr("fill", screen.bgcolor)
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("transform", "translate(-15, -8)");
+    
     let frameScreen = screengroup.append("rect")
         .attr('width', screen.width)
         .attr('height', screen.height)
         .attr("fill", screen.color)
+    .attr("transform", "translate(-7, 0)");
 
     let background = screengroup.append('image')
-        .attr('xlink:href', 'images/background.jpg')
-        .attr('height', screen.height - 10)
-        .attr("transform", "translate(5, 5)")
+        .attr("opacity", 0.3)
+        .attr('xlink:href', 'images/bg2.gif')
+        .attr("id", "bg-image")
+        .attr('height', screen.height)
     ;
+
+    screengroup.append('image')
+        .attr('xlink:href', 'images/dots.png')
+        .attr('height', screen.height - 120)
+        .attr("transform", "translate(-5, 20)")
+        // .attr("x", 300)
+    ;
+
+    screengroup.append('image')
+        .attr("id", "dot")
+        .attr('xlink:href', 'images/glow.png')
+        .attr('height', 30)
+        .attr("transform", "translate(-4, 20)")
+        .attr("y", dotPosition(currentFloor));
+    ;
+
 
     controlPanel.selectAll(".rectButton")
         .data(floors)
@@ -209,17 +241,9 @@
         .attr("fill", button.color)
         .attr("width", button.width)
         .attr("height", button.height)
-        // .on("mouseover", function (d) {
-        //     d3.select(this).transition().duration(200)
-        //         .attr("fill", button.hoverColor)
-        // })
-        // .on("mouseleave", function (d) {
-        //     d3.select(this).transition().duration(200)
-        //         .attr("fill", button.color)
-        // })
-        .on("click", async function(di,i){
+        .on("click", function(di,i){
             closeDoor()
-            highlightButton("#button_" + i, Math.abs(currentFloor-di) * 1500);
+            highlightButton("#button_" + i, (Math.abs(currentFloor-di)+1) * 1500);
         
             let destination = di;
             let c = parseInt(currentFloor);
@@ -234,7 +258,7 @@
 
                 let thisInterval1 = setInterval(function () {
                     currentFloor += 1;
-                    updateIndicatorText();
+                    updateIndicator();
                     console.log(currentFloor)
                     if (currentFloor === destination){
                         clearInterval(thisInterval1);
@@ -248,7 +272,7 @@
 
                 let thisInterval1 = setInterval(function () {
                     currentFloor -= 1;
-                    updateIndicatorText();
+                    updateIndicator();
                     console.log(currentFloor)
                     if (currentFloor === destination){
                         clearInterval(thisInterval1);
@@ -283,12 +307,10 @@
         .attr("y", button.y)
     .text(d => d ? d : "B")
     .attr("fill", "white")
-        .attr("transform", "translate("+ (button.width - button.circleRadius - 10)+ ",25)")
+        .attr("transform", "translate("+ (button.width - button.circleRadius - 8)+ ",25)")
         .attr("font-size", button.fontSize)
         .attr("font-weight", "900")
         .attr("font-family", "monospace")
-        // .attr("stroke", button.textStroke)
-        // .attr("stroke-width", 0.5)
 
 
     controlPanel.selectAll(".lineOnPanel")
@@ -387,6 +409,22 @@
         .attr('height', lower.imgSize)
         .attr("transform", (d,i) => "translate("+ (30 + button.x + 90*i) +", 45)")
 
+   
+    // ────────────────────────── M I S C  ──────────────────────────
+
+    let bottomGroup = wallGroupSVG.append("g").attr("transform", "translate(20," + (doorHeight-150) + ")");
+        
+        bottomGroup.append('image')
+        .attr('xlink:href', 'images/speaker.png')
+        .attr('height', 100)
+        .attr("transform", "translate(150, 5)")
+
+    bottomGroup.append('image')
+        .attr('xlink:href', 'images/AlarmBottom.png')
+        .attr('height', 50)
+        .attr("transform", "translate(300, 30)")
+    ;
+
     // ────────────────────────── I N T E R A C T I O N  ──────────────────────────
     d3.select("#button_Open")
         .on("click", function () {
@@ -399,32 +437,39 @@
             closeDoor();
             highlightButton("#button_Close", 1500)
         })
-    
+
     function closeDoor(delayTime){
         d3.select("#door").transition().duration(1200).delay(delayTime?delayTime:0)
             .attr("x", 0)
     }
-    
+
     function openDoor(delayTime){
         d3.select("#door").transition().duration(1200).delay(delayTime?delayTime:0)
             .attr("x", doorWidth)
     }
-    
+
     for (let i = 0; i < floors.length; i++){
         let selection = d3.selectAll(".button_" + i);
 
         let prevColor = selection.attr("fill")
     }
-    
-    function updateIndicatorText(){
+
+    function updateIndicator(){
         d3.select("#indicatorText")
             .text(currentFloor?currentFloor:"B");
+
+        d3.select("#dot")
+            .transition()
+            .duration(500)
+            .attr("y", dotPosition(currentFloor));
+        ;
     }
-    
+
     function highlightButton(id, time){
         d3.select(id).transition().duration(50).attr("fill", button.highlightColor);
         d3.select(id).transition().duration(300).delay(time).attr("fill", button.color);
     }
+
 </script>
 </body>
 </html>
