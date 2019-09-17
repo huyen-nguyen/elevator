@@ -8,6 +8,7 @@ const xPosition = 100;
 
 let svg = d3.select("body").append("svg")
     .attr("width", svgWidth).attr("height", svgHeight);
+
 let doorGroup = svg.append("g");
 let wallGroupSVG = svg.append("g").attr("transform", "translate(" + doorWidth + ",0)");
 let wallGroupDiv = d3.select("body").append("g");
@@ -22,7 +23,7 @@ wallGroupSVG.append("rect")
 
 let background = wallGroupSVG.append('image')
     .attr('xlink:href', 'images/background.jpg')
-    .attr('width', 200)
+    .attr('width', 400)
     .attr('height', 400)
 .attr("transform", "translate(100, 300)");
 

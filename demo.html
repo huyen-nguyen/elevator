@@ -4,9 +4,258 @@
     <meta charset="UTF-8">
     <title>Demo</title>
     <script src="lib/d3.v4.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Baloo&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="styles/main.css">
+
 </head>
 <body>
-<script src="js/main.js"></script>
+<!--<script src="js/main.js"></script>-->
+
+<div id="mainContent"></div>
+<script>
+
+    const wallWidth = 700;
+    const wallHeight = 1000;
+    const doorWidth = 700;
+    const doorHeight = 1000;
+    const svgWidth = doorWidth + wallWidth;
+    const svgHeight = 1000;
+    const xPosition = 100;
+    const floors = ["3", "2", "1", "B"];
+    const info = ["CS labs", "CS office", "Enginneering center", "IT central"]
+
+    const main = "#mainContent"
+    const button = {
+        r: 13,
+        x: 100,
+        y: function (d, i) {
+            return 40 + 70*i
+        },
+        width: 60,
+        height: 36,
+        color: "#cce2e4",
+        hoverColor: "rgba(5,221,224,0.7)",
+        circleColor: "#018592",
+        circleRadius: 15,
+        textStroke: "#2e7c9e",
+        fontSize: 17,
+    }
+
+    const indicator = {
+        barHeight: 100,
+        barColor: "#e1e1e1",
+        x: 115,
+        y: 115,
+        width: 200,
+        height: 90,
+        backgroundColor: "#909090",
+        displayWidth: 180,
+        displayHeight: 70,
+        displayBackGroundColor: "black",
+        textColor: "#00fd42",
+        textSize: 30,
+        triangleColorOn: "#0be748",
+        triangleColorOff: "#343434",
+        triangleMargin: 35,
+    }
+
+    const line = {
+        length: 40,
+        color: "white",
+    }
+
+    const screen = {
+        width: 300,
+        height: 450,
+        color: "#414141"
+    }
+    let svg = d3.select(main).append("svg")
+        .attr("width", svgWidth).attr("height", svgHeight);
+
+    // ───────────────── DIVIDE SECTIONS ──────────────────
+
+    let wallGroupSVG = svg.append("g")
+        .attr("transform", "translate(" + doorWidth + ",0)")
+        .attr("id", "wallGroupSVG");
+
+    let indicatorSVG = svg.append("g")
+
+    // ───────────────── ON THE WALL ──────────────────
+
+    // back wall
+    wallGroupSVG.append("rect")
+        .attr("width", wallWidth)
+        .attr("height", wallHeight)
+        .attr("fill", "#f1f1f1")
+
+    // actual wall
+    wallGroupSVG.append("rect")
+        .attr("transform", "translate(" + 15 + ",0)")
+        .attr("width", wallWidth - 15)
+        .attr("height", wallHeight)
+        .attr("fill", "#e1e1e1")
+
+    // ───────────────────────────────────────────────────────────────
+    // ────────────────────────── Indicator ──────────────────────────
+
+    indicatorSVG.append("rect")
+        .attr("width", doorWidth)
+        .attr("height", indicator.barHeight)
+        .attr("fill", indicator.barColor)
+
+    let indicatorGroup = indicatorSVG.append("g").attr("transform", "translate(" +
+        ((doorWidth-indicator.width)/2) + "," + ((indicator.barHeight - indicator.height)/2) + ")"
+    );
+
+    indicatorGroup.append("rect")
+        .attr("id", "indicator")
+        .attr("width", indicator.width)
+        .attr("height", indicator.height)
+        .attr("fill", indicator.backgroundColor);
+
+    indicatorGroup.append("rect")
+        .attr("width", indicator.displayWidth)
+        .attr("height", indicator.displayHeight)
+        .attr("fill", indicator.displayBackGroundColor)
+        .attr("transform", "translate("+
+            ((indicator.width-indicator.displayWidth)/2) +"," +
+            ((indicator.height-indicator.displayHeight)/2) +
+            ")");
+
+    let triangle = d3.symbol().type(d3.symbolTriangle);
+
+    indicatorGroup.append("g")
+        .append("path")
+        .attr("d", triangle.size(200))
+        .style("fill", indicator.triangleColorOn)
+        .attr("transform", "translate(" + indicator.triangleMargin + ", 50)")
+
+    indicatorGroup.append("g")
+        .append("path")
+        .attr("d", triangle.size(200))
+        .style("fill", indicator.triangleColorOff)
+        .attr("transform", "translate(" + (indicator.width-indicator.triangleMargin) + ", 43) rotate(180)");
+
+    indicatorGroup.append("text")
+        .attr("id", "indicatorText")
+        .text("1")
+        .attr("font-size", indicator.textSize)
+        .attr("class", "customFont")
+        .attr("fill", indicator.textColor)
+        .attr("transform", "translate(" +
+            ((indicator.width)/2 - 10) + ","+ (indicator.barHeight/2 + indicator.textSize/2) +")")
+
+
+    // ────────────────────────────────────────────────────────────────────────
+    // ────────────────────────── Main CONTROL PANEL ──────────────────────────
+
+    let controlPanel = wallGroupSVG.append("g").attr("transform", "translate(80, 270)");
+
+    let screengroup = controlPanel.append("g").attr("transform", "translate(70,0)");
+
+    let frameScreen = screengroup.append("rect")
+        .attr('width', screen.width)
+        .attr('height', screen.height)
+        .attr("fill", screen.color)
+
+    let background = screengroup.append('image')
+        .attr('xlink:href', 'images/background.jpg')
+        .attr('height', screen.height - 10)
+        .attr("transform", "translate(5, 5)")
+    ;
+
+    controlPanel.selectAll(".rectButton")
+        .data(floors)
+        .enter()
+        .append("rect")
+        .attr("class", (d,i) => "rectButton button_" + i)
+        .attr("rx", button.r)
+        .attr("ry", button.r)
+        .attr("x", button.x)
+        .attr("y", button.y)
+        .attr("fill", button.color)
+        .attr("width", button.width)
+        .attr("height", button.height)
+        .on("mouseover", function (d) {
+            d3.select(this).transition().duration(200)
+                .attr("fill", button.hoverColor)
+        })
+        .on("mouseleave", function (d) {
+            d3.select(this).transition().duration(200)
+                .attr("fill", button.color)
+        });
+
+    controlPanel.selectAll(".circleOnButton")
+        .data(floors)
+        .enter()
+        .append("circle")
+        .attr("class", (d,i) => "circleOnButton button_" + i)
+        .attr("r", button.circleRadius)
+        .attr("cx", button.x)
+        .attr("cy", button.y)
+        .attr("fill", button.circleColor)
+        .attr("fill-opacity", 0.9)
+        // .attr("stroke", button.color)
+        // .attr("stroke-width", )
+        .attr("transform", "translate("+ (button.width - button.circleRadius - 3) + ","+ (button.height/2) +")");
+
+    controlPanel.selectAll(".textOnButton")
+        .data(floors)
+        .enter()
+        .append("text")
+        .attr("class", "textOnButton")
+        .attr("x", button.x)
+        .attr("y", button.y)
+    .text(d => d)
+    .attr("fill", "white")
+        .attr("transform", "translate("+ (button.width - button.circleRadius - 10)+ ",25)")
+        .attr("font-size", button.fontSize)
+        .attr("font-weight", "900")
+        .attr("font-family", "monospace")
+        // .attr("stroke", button.textStroke)
+        // .attr("stroke-width", 0.5)
+
+
+    controlPanel.selectAll(".lineOnPanel")
+        .data(floors)
+        .enter()
+        .append("line")
+        .attr("class", "lineOnPanel")
+        .attr("x1", button.x + button.width)
+        .attr("x2", button.x + button.width + line.length)
+        .attr("y1", button.y)
+        .attr("y2", button.y)
+        .attr("stroke", line.color)
+        .attr("transform", "translate(0," + (button.height/2) + ")");
+
+
+    controlPanel.selectAll(".textOnPanel")
+        .data(info)
+        .enter()
+        .append("text")
+        .attr("class", "textOnPanel" )
+        .attr("x", button.x + button.width + line.length + 5)
+        .attr("y", button.y)
+        .html(d => {
+            let thisX = button.x + button.width + line.length + 5;
+            return d.length > 15 ?
+                "<tspan x='" + thisX + "' dy='0em'>" + d.split(" ")[0] + "</tspan>"
+                + "<tspan x='" + thisX + "' dy='1.2em'>" + d.split(" ")[1] + "</tspan>"
+                : d
+        })
+
+        .attr("transform", "translate(0," + (button.height/2) + ")")
+        .attr("fill", line.color)
+        .attr("alignment-baseline", d => d.length > 15? "inherit" : "middle");
+
+
+    for (let i = 0; i < floors.length; i++){
+        let selection = d3.selectAll(".button_" + i);
+
+        let prevColor = selection.attr("fill")
+    }
+</script>
 </body>
 </html>
