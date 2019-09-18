@@ -86,6 +86,8 @@
     
     const lower = {
         x: (d,i) =>  button.x + 90*i,
+        x2: (d,i) =>  button.x2 + 90*i,
+        
         imgSize: 25,
     }
 
@@ -333,6 +335,7 @@
         .enter()
         .append("rect")
         .attr("id", (d,i) => "button_" + d)
+        .attr("class", (d,i) => "lowerButton button_" + d)
         .attr("rx", button.r)
         .attr("ry", button.r)
         .attr("x", lower.x)
@@ -346,7 +349,7 @@
         .data(lowerInfo)
         .enter()
         .append("text")
-        .attr("class", "lowerInfo")
+        .attr("class", (d,i) => "lowerInfo button_" + d)
         .attr("x", lower.x)
         .attr("y", 30)
         .text(d => d)
@@ -358,6 +361,7 @@
         .data(lowerInfo)
         .enter()
         .append("circle")
+        .attr("class", (d,i) => "circleLower button_" + d + " onLowerButton_" + d)
         .attr("r", button.circleRadius)
         .attr("cx", lower.x)
         .attr("cy", 40)
@@ -372,12 +376,12 @@
         .data(lowerInfo)
         .enter()
         .append('image')
-        .attr("class", "imageLower")
+        .attr("class", (d,i) => "imageLower" + " onLowerButton_" + d)
         .attr('xlink:href', (d,i) =>  'images/' + d + '.png')
         .attr('height', lower.imgSize)
         .attr("transform", (d,i) => "translate("+ (30 + button.x + 90*i) +", 45)")
 
-   
+    
     // ────────────────────────── M I S C  ──────────────────────────
 
     let bottomGroup = wallGroupSVG.append("g").attr("transform", "translate(20," + (doorHeight-150) + ")");
@@ -397,13 +401,13 @@
     d3.select("#button_Open")
         .on("click", function () {
             openDoor();
-            highlightButton("#button_Open", 1500)
+            highlightButton("Open", 1500)
         })
 
     d3.select("#button_Close")
         .on("click", function () {
             closeDoor();
-            highlightButton("#button_Close", 1500)
+            highlightButton("Close", 1500)
         })
 
     function closeDoor(delayTime){
@@ -474,18 +478,26 @@
             .duration(500)
             .attr("y", dotPosition(currentFloor));
     }
-
+ 
     function highlightButton(id, time){
         d3.select("#button_" + id).transition().duration(50).attr("fill", button.highlightColor);
-        d3.selectAll(".onButton_" + id).transition().duration(50)
+        d3.selectAll(".onButton_" + id).transition().duration(100)
             .attr("cx", button.x2)
             .attr("x", button.x2);
         
+        // d3.selectAll(".onLowerButton_" + id).transition().duration(100)
+        //     .attr("cx", lower.x2)
+        
+        
         
         d3.select("#button_" + id).transition().duration(300).delay(time).attr("fill", button.color);
+        
         d3.selectAll(".onButton_" + id).transition().duration(300).delay(time)
             .attr("x", button.x)
             .attr("cx", button.x);
+        
+        // d3.selectAll(".onLowerButton_" + id).transition().duration(300).delay(time)
+        //     .attr("cx", lower.x)
     }
 
 </script>
