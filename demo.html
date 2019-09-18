@@ -25,7 +25,7 @@
     const xPosition = 100;
     const floors = [3, 2, 1, 0];
     const panelPositionY = 400;
-    const info = ["CS labs", "CS office", "Enginneering center", "IT central"]
+    const info = ["Conference Space", "Laboratories", "Hub Office", "IT services"]
 
     const lowerInfo = ["Open", "Close", "Alarm"]
     const main = "#mainContent"
@@ -36,6 +36,7 @@
     const button = {
         r: 16,
         x: 100,
+        x2: 77,
         y: function (d, i) {
             return 40 + 70*i
         },
@@ -45,7 +46,7 @@
         hoverColor: "rgba(5,221,224,0.7)",
         circleColor: "transparent",
         circleRadius: 16,
-        circleStrokeColor: "#49c4ff",
+        circleStrokeColor: "#4bd5ff",
         textStroke: "#3896bf",
         fontSize: 17,
         strokeWidth: 2,
@@ -89,7 +90,7 @@
     }
 
     const dotPosition = function (i){
-        return 230 - 70*i
+        return 240 - 70*i
     }
     
     let svg = d3.select(main).append("svg")
@@ -114,7 +115,6 @@
         .attr("height", doorHeight)
         .attr("fill", door.color)
         .attr("x", 0)
-        
     
     // ───────────────── ON THE WALL ──────────────────
 
@@ -184,12 +184,14 @@
 
 
     // ────────────────────────────────────────────────────────────────────────
+    
     // ────────────────────────── Main CONTROL PANEL ──────────────────────────
+
+    // ────────────────────────── Screen  ──────────────────────────
     
-    let screengroup = wallGroupSVG.append("g").attr("transform", "translate(150,"+panelPositionY+")");
-    
-    let controlPanel = wallGroupSVG.append("g")
-        .attr("id", "controlPanel").attr("transform", "translate(80,"+panelPositionY+")");
+    let screengroup = wallGroupSVG.append("g")
+        .attr("id", "screengroup")
+        .attr("transform", "translate(150,"+(panelPositionY-10)+")");
 
     screengroup.append("rect")
         .attr('width', screen.width + 15)
@@ -199,13 +201,13 @@
         .attr("ry", 4)
         .attr("transform", "translate(-15, -8)");
     
-    let frameScreen = screengroup.append("rect")
+    screengroup.append("rect")
         .attr('width', screen.width)
         .attr('height', screen.height)
         .attr("fill", screen.color)
     .attr("transform", "translate(-7, 0)");
 
-    let background = screengroup.append('image')
+    screengroup.append('image')
         .attr("opacity", 0.3)
         .attr('xlink:href', 'images/bg2.gif')
         .attr("id", "bg-image")
@@ -215,8 +217,7 @@
     screengroup.append('image')
         .attr('xlink:href', 'images/dots.png')
         .attr('height', screen.height - 120)
-        .attr("transform", "translate(-5, 20)")
-        // .attr("x", 300)
+        .attr("transform", "translate(-5, 30)")
     ;
 
     screengroup.append('image')
@@ -227,13 +228,27 @@
         .attr("y", dotPosition(currentFloor));
     ;
 
+    screengroup.append('image')
+        .attr('xlink:href', 'images/disability.png')
+        .attr('height', 50)
+        .attr("transform", "translate("+(screen.width+10)+","+(screen.height-60)+")");
+    ;
+    screengroup.append("text")
+        .html("I N N O V A T I O N &nbsp; &nbsp;H U B")
+        .attr("fill", "white")
+        .attr("transform", "translate(30, 30)")
 
+    // ────────────────────────── C O N T R O L ──────────────────────────
+
+    let controlPanel = wallGroupSVG.append("g")
+        .attr("id", "controlPanel").attr("transform", "translate(80,"+panelPositionY+")");
+    
     controlPanel.selectAll(".rectButton")
         .data(floors)
         .enter()
         .append("rect")
-        .attr("class", (d,i) => "rectButton button_" + i)
-        .attr("id", (d,i) => "button_" + i)
+        .attr("class", (d,i) => "rectButton button_" + d)
+        .attr("id", (d,i) => "button_" + d)
         .attr("rx", button.r)
         .attr("ry", button.r)
         .attr("x", button.x)
@@ -241,54 +256,13 @@
         .attr("fill", button.color)
         .attr("width", button.width)
         .attr("height", button.height)
-        .on("click", function(di,i){
-            closeDoor()
-            highlightButton("#button_" + i, (Math.abs(currentFloor-di)+1) * 1500);
-        
-            let destination = di;
-            let c = parseInt(currentFloor);
-            let d = parseInt(destination);
-            let distance = Math.abs(currentFloor-destination);
-            console.log("travel")
-
-            if (c < d){ // going up
-                console.log("up")
-                d3.select("#upSign").attr("fill", indicator.triangleColorOn);
-                d3.select("#downSign").attr("fill", indicator.triangleColorOff);
-
-                let thisInterval1 = setInterval(function () {
-                    currentFloor += 1;
-                    updateIndicator();
-                    console.log(currentFloor)
-                    if (currentFloor === destination){
-                        clearInterval(thisInterval1);
-                    }
-                }, 1500)
-            }
-
-            else if (currentFloor > destination){ // going down
-                d3.select("#upSign").attr("fill", indicator.triangleColorOff);
-                d3.select("#downSign").attr("fill", indicator.triangleColorOn);
-
-                let thisInterval1 = setInterval(function () {
-                    currentFloor -= 1;
-                    updateIndicator();
-                    console.log(currentFloor)
-                    if (currentFloor === destination){
-                        clearInterval(thisInterval1);
-                    }
-                }, 1500)
-            }
-            
-            openDoor(distance * 2000)
-        })
       ;
 
     controlPanel.selectAll(".circleOnButton")
         .data(floors)
         .enter()
         .append("circle")
-        .attr("class", (d,i) => "circleOnButton button_" + i)
+        .attr("class", (d,i) => "circleOnButton button_" + d + " onButton_" + d)
         .attr("r", button.circleRadius)
         .attr("cx", button.x)
         .attr("cy", button.y)
@@ -302,7 +276,7 @@
         .data(floors)
         .enter()
         .append("text")
-        .attr("class", "textOnButton")
+        .attr("class", (d,i) =>  "textOnButton button_" + d+ " onButton_" + d)
         .attr("x", button.x)
         .attr("y", button.y)
     .text(d => d ? d : "B")
@@ -345,6 +319,9 @@
         .attr("fill", line.color)
         .attr("alignment-baseline", d => d.length > 15? "inherit" : "middle");
 
+   
+
+
     // ────────────────────────── D O W N  B U T T O N  ──────────────────────────
 
     let lowerGroup = controlPanel.append("g")
@@ -363,20 +340,13 @@
         .attr("fill", button.color)
         .attr("width", button.width)
         .attr("height", button.height)
-        // .on("mouseover", function (d) {
-        //     d3.select(this).transition().duration(200)
-        //         .attr("fill", button.hoverColor)
-        // })
-        // .on("mouseleave", function (d) {
-        //     d3.select(this).transition().duration(200)
-        //         .attr("fill", button.color)
-        // });
+ 
 
     lowerGroup.selectAll(".lowerInfo")
         .data(lowerInfo)
         .enter()
         .append("text")
-        .attr("class", "lowerInfo" )
+        .attr("class", "lowerInfo")
         .attr("x", lower.x)
         .attr("y", 30)
         .text(d => d)
@@ -395,8 +365,6 @@
         .attr("fill-opacity", 0.9)
         .attr("stroke", button.circleStrokeColor)
         .attr("stroke-width", button.strokeWidth)
-        // .attr("stroke", button.color)
-        // .attr("stroke-width", )
         .attr("transform", "translate("+ (button.width - button.circleRadius - 3) + ","+ (button.height/2) +")");
 
     lowerGroup
@@ -449,9 +417,52 @@
     }
 
     for (let i = 0; i < floors.length; i++){
-        let selection = d3.selectAll(".button_" + i);
+      d3.selectAll(".button_" + i)
+          .style("cursor", "pointer")
+          .on("click", function(di,i){
+              highlightButton(di, (Math.abs(currentFloor-di)+1) * 1500);
 
-        let prevColor = selection.attr("fill")
+              let destination = di;
+              let c = parseInt(currentFloor);
+              let d = parseInt(destination);
+              let distance = Math.abs(currentFloor-destination);
+              console.log("travel")
+              console.log("i: ", di, "currentFloor: ", currentFloor, "destination: ", destination)
+
+              if (c < d){ // going up
+                  closeDoor()
+                  d3.select("#upSign").attr("fill", indicator.triangleColorOn);
+                  d3.select("#downSign").attr("fill", indicator.triangleColorOff);
+
+                  let thisInterval1 = setInterval(function () {
+                      currentFloor += 1;
+                      updateIndicator();
+                      console.log(currentFloor)
+                      if (currentFloor === destination){
+                          clearInterval(thisInterval1);
+                      }
+                  }, 1500)
+                  openDoor(distance * 1500 + 1000)
+              }
+
+              else if (currentFloor > destination){ // going down
+                  d3.select("#upSign").attr("fill", indicator.triangleColorOff);
+                  d3.select("#downSign").attr("fill", indicator.triangleColorOn);
+
+                  closeDoor()
+                  let thisInterval1 = setInterval(function () {
+                      currentFloor -= 1;
+                      updateIndicator();
+                      console.log(currentFloor)
+                      if (currentFloor === destination){
+                          clearInterval(thisInterval1);
+                      }
+                  }, 1500)
+
+                  openDoor(distance * 1500 + 1000)
+              }
+              
+          });
     }
 
     function updateIndicator(){
@@ -462,12 +473,19 @@
             .transition()
             .duration(500)
             .attr("y", dotPosition(currentFloor));
-        ;
     }
 
     function highlightButton(id, time){
-        d3.select(id).transition().duration(50).attr("fill", button.highlightColor);
-        d3.select(id).transition().duration(300).delay(time).attr("fill", button.color);
+        d3.select("#button_" + id).transition().duration(50).attr("fill", button.highlightColor);
+        d3.selectAll(".onButton_" + id).transition().duration(50)
+            .attr("cx", button.x2)
+            .attr("x", button.x2);
+        
+        
+        d3.select("#button_" + id).transition().duration(300).delay(time).attr("fill", button.color);
+        d3.selectAll(".onButton_" + id).transition().duration(300).delay(time)
+            .attr("x", button.x)
+            .attr("cx", button.x);
     }
 
 </script>
