@@ -17,8 +17,8 @@
 <script>
 
     const wallWidth = 700;
-    const wallHeight = 1200;
-    const doorWidth = 500;
+    const wallHeight = 1100;
+    const doorWidth = 1200;
     const doorHeight = wallHeight;
     const svgWidth = doorWidth + wallWidth;
     const svgHeight = wallHeight;
@@ -98,7 +98,7 @@
     let svg = d3.select(main).append("svg")
         .attr("width", svgWidth).attr("height", svgHeight);
     
-    let currentFloor = 2;
+    let currentFloor = 1;
     let doorOpen = false;
 
     // ───────────────── DIVIDE SECTIONS ──────────────────
