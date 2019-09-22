@@ -4,11 +4,11 @@
 
 
 ### Links
-[Presentation page](https://nnhuyen.github.io/new-hw1)
+[Presentation page](https://nnhuyen.github.io/elevator)
 
-[GitHub repository](https://github.com/nnhuyen/new-hw1) 
+[GitHub repository](https://github.com/nnhuyen/elevator) 
 
-[Demo](https://nnhuyen.github.io/new-hw1/demo.html)
+[Demo](https://nnhuyen.github.io/elevator/demo.html)
 
 [Video (optional)](https://www.youtube.com/embed/uilkmUoXoLU)
 
