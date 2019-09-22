@@ -1,11 +1,60 @@
-# Elevator
+# Report: Homework 1 - Elevator
 
-[Demo](https://nnhuyen.github.io/HCI-HW1-Elevator/demo.html)
+### Huyen Nguyen 
 
-The elevator in the ECE building: 
-![Elevator_Image_Huyen](/images/example.jpg)
+
+### Links
+[Presentation page](https://nnhuyen.github.io/new-hw1)
+
+[GitHub repository](https://github.com/nnhuyen/new-hw1) 
+
+[Demo](https://nnhuyen.github.io/new-hw1/demo.html)
+
+[Video (optional)](https://www.youtube.com/embed/uilkmUoXoLU)
+
+
+### Getting C:
+- Example: The elevator in the Electrical & Computer Engineering building at Texas Tech
+
+- Take photos of the control interface
+
+![Elevator_Image_Huyen](https://i.imgur.com/D8NAp0d.jpg)
+
+-  Show a gif image of the control interface in operation.
 
 ![Elevator_Gif_Huyen](https://media.giphy.com/media/fAbByUYxLUGE6ygSvZ/giphy.gif)
 
-There's no indicator for the current floor inside the elevator.
+- Find the issues with the current design.
 
+- Explain why it is bad.
+
+### Getting B:
+- Think about the common things that you use an elevator. List your most common uses and other more rare uses. Does the interface make doing those common things easier?
+
+- Think about how the user interacts with the elevator. What is the common sequence of actions?
+
+- How does the elevator support the user figure out how to make it work?
+
+- How does the elevator provide feedback to the user?
+
+- What are some common mistakes you can make with this current design?
+
+- Suggest the improvements to make on the control interface. Sketch your solution. And justify your design decisions.
+
+### Getting A
+
+- Now, imagine that you can have a touch screen on the elevator
+
+- Come with your design for the touch screen? What is the screen size that you want?
+
+- Design and implement interactive features
+
+- Design and implement user feedback
+
+### Extra credits:
+
+- Your design supports people with disabilities
+
+- You provide extra useful information on the display interface.
+
+- Your imagination ...
