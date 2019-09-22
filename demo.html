@@ -11,11 +11,9 @@
 
 </head>
 <body>
-<!--<script src="js/main.js"></script>-->
-
 <div id="mainContent"></div>
+<!--<script src="js/main.js"></script>-->
 <script>
-
     const wallWidth = 600;
     const wallHeight = 900;
     const doorWidth = 600;
@@ -29,7 +27,7 @@
 
     const lowerInfo = ["Open", "Close", "Alarm"]
     const main = "#mainContent"
-    
+
     const door = {
         color: "#505050"
     }
@@ -83,27 +81,30 @@
         color: "#020328",
         bgcolor: "#777777"
     }
-    
+
     const lower = {
-        x: (d,i) =>  button.x + 90*i,
-        x2: (d,i) =>  button.x2 + 90*i,
-        
+        x: (d, i) => 100 + 90 * lowerInfo.indexOf(d),
+        x2: (d, i) => 77 + 90 * lowerInfo.indexOf(d),
+        image: {
+            x: (d, i) => 130 + 90 * lowerInfo.indexOf(d),
+            x2: (d,i) => 108 + 90*lowerInfo.indexOf(d),
+        },
         imgSize: 25,
     }
 
     const dotPosition = function (i){
         return 240 - 70*i
     }
-    
+
     let svg = d3.select(main).append("svg")
         .attr("width", svgWidth).attr("height", svgHeight);
-    
+
     let currentFloor = 1;
     let doorOpen = false;
 
     // ───────────────── DIVIDE SECTIONS ──────────────────
     let doorSVG = svg.append("g");
-    
+
     let wallGroupSVG = svg.append("g")
         .attr("transform", "translate(" + doorWidth + ",0)")
         .attr("id", "wallGroupSVG");
@@ -117,7 +118,7 @@
         .attr("height", doorHeight)
         .attr("fill", door.color)
         .attr("x", 0)
-    
+
     // ───────────────── ON THE WALL ──────────────────
 
     // back wall
@@ -186,11 +187,11 @@
 
 
     // ────────────────────────────────────────────────────────────────────────
-    
+
     // ────────────────────────── Main CONTROL PANEL ──────────────────────────
 
     // ────────────────────────── Screen  ──────────────────────────
-    
+
     let screengroup = wallGroupSVG.append("g")
         .attr("id", "screengroup")
         .attr("transform", "translate(150,"+(panelPositionY-10)+")");
@@ -202,15 +203,15 @@
         .attr("rx", 4)
         .attr("ry", 4)
         .attr("transform", "translate(-15, -8)");
-    
+
     screengroup.append("rect")
         .attr('width', screen.width)
         .attr('height', screen.height)
         .attr("fill", screen.color)
-    .attr("transform", "translate(-7, 0)");
+        .attr("transform", "translate(-7, 0)");
 
     screengroup.append('image')
-        .attr("opacity", 0.3)
+        .attr("opacity", 0.4)
         .attr('xlink:href', 'images/bg2.gif')
         .attr("id", "bg-image")
         .attr('height', screen.height)
@@ -230,10 +231,27 @@
         .attr("y", dotPosition(currentFloor));
     ;
 
+    let toggleD = true;
     screengroup.append('image')
         .attr('xlink:href', 'images/disability.png')
         .attr('height', 50)
-        .attr("transform", "translate("+(screen.width+10)+","+(screen.height-60)+")");
+        .attr("transform", "translate("+(screen.width+10)+","+(screen.height-60)+")")
+        .on("click", function () {
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("opacity", () => {
+                if (toggleD) {
+                    toggleD = false;
+                    return 0.5
+                }
+                else {
+                    toggleD = true;
+                    return 1
+                }
+            })
+
+        });
     ;
     screengroup.append("text")
         .html("I N N O V A T I O N &nbsp; &nbsp;H U B")
@@ -244,7 +262,7 @@
 
     let controlPanel = wallGroupSVG.append("g")
         .attr("id", "controlPanel").attr("transform", "translate(80,"+panelPositionY+")");
-    
+
     controlPanel.selectAll(".rectButton")
         .data(floors)
         .enter()
@@ -258,7 +276,7 @@
         .attr("fill", button.color)
         .attr("width", button.width)
         .attr("height", button.height)
-      ;
+    ;
 
     controlPanel.selectAll(".circleOnButton")
         .data(floors)
@@ -281,8 +299,8 @@
         .attr("class", (d,i) =>  "textOnButton button_" + d+ " onButton_" + d)
         .attr("x", button.x)
         .attr("y", button.y)
-    .text(d => d ? d : "B")
-    .attr("fill", "white")
+        .text(d => d ? d : "B")
+        .attr("fill", "white")
         .attr("transform", "translate("+ (button.width - button.circleRadius - 8)+ ",25)")
         .attr("font-size", button.fontSize)
         .attr("font-weight", "900")
@@ -321,7 +339,7 @@
         .attr("fill", line.color)
         .attr("alignment-baseline", d => d.length > 15? "inherit" : "middle");
 
-   
+
 
 
     // ────────────────────────── D O W N  B U T T O N  ──────────────────────────
@@ -329,7 +347,7 @@
     let lowerGroup = controlPanel.append("g")
         .attr("id", "lowerGroup")
         .attr("transform", "translate(0,300)");
-    
+
     lowerGroup.selectAll(".lowerButton")
         .data(lowerInfo)
         .enter()
@@ -343,13 +361,13 @@
         .attr("fill", button.color)
         .attr("width", button.width)
         .attr("height", button.height)
- 
+
 
     lowerGroup.selectAll(".lowerInfo")
         .data(lowerInfo)
         .enter()
         .append("text")
-        .attr("class", (d,i) => "lowerInfo button_" + d)
+        .attr("class", (d,i) => "lowerInfo")
         .attr("x", lower.x)
         .attr("y", 30)
         .text(d => d)
@@ -376,17 +394,18 @@
         .data(lowerInfo)
         .enter()
         .append('image')
-        .attr("class", (d,i) => "imageLower" + " onLowerButton_" + d)
+        .attr("class", (d,i) => "imageLower" + "button_" + d + " onLowerButton_" + d)
         .attr('xlink:href', (d,i) =>  'images/' + d + '.png')
         .attr('height', lower.imgSize)
-        .attr("transform", (d,i) => "translate("+ (30 + button.x + 90*i) +", 45)")
+        .attr("x", lower.image.x)
+        .attr("transform", (d,i) => "translate(0, 45)")
 
-    
+
     // ────────────────────────── M I S C  ──────────────────────────
 
     let bottomGroup = wallGroupSVG.append("g").attr("transform", "translate(20," + (doorHeight-150) + ")");
-        
-        bottomGroup.append('image')
+
+    bottomGroup.append('image')
         .attr('xlink:href', 'images/speaker.png')
         .attr('height', 100)
         .attr("transform", "translate(150, 5)")
@@ -410,6 +429,11 @@
             highlightButton("Close", 1500)
         })
 
+    d3.select("#button_Alarm")
+        .on("click", function () {
+            highlightButton("Alarm", 1500)
+        })
+
     function closeDoor(delayTime){
         d3.select("#door").transition().duration(1200).delay(delayTime?delayTime:0)
             .attr("x", 0)
@@ -421,52 +445,52 @@
     }
 
     for (let i = 0; i < floors.length; i++){
-      d3.selectAll(".button_" + i)
-          .style("cursor", "pointer")
-          .on("click", function(di,i){
-              highlightButton(di, (Math.abs(currentFloor-di)+1) * 1500);
+        d3.selectAll(".button_" + i)
+            .style("cursor", "pointer")
+            .on("click", function(di,i){
+                highlightButton(di, (Math.abs(currentFloor-di)+1) * 1500);
 
-              let destination = di;
-              let c = parseInt(currentFloor);
-              let d = parseInt(destination);
-              let distance = Math.abs(currentFloor-destination);
-              console.log("travel")
-              console.log("i: ", di, "currentFloor: ", currentFloor, "destination: ", destination)
+                let destination = di;
+                let c = parseInt(currentFloor);
+                let d = parseInt(destination);
+                let distance = Math.abs(currentFloor-destination);
+                console.log("travel")
+                console.log("i: ", di, "currentFloor: ", currentFloor, "destination: ", destination)
 
-              if (c < d){ // going up
-                  closeDoor()
-                  d3.select("#upSign").attr("fill", indicator.triangleColorOn);
-                  d3.select("#downSign").attr("fill", indicator.triangleColorOff);
+                if (c < d){ // going up
+                    closeDoor()
+                    d3.select("#upSign").attr("fill", indicator.triangleColorOn);
+                    d3.select("#downSign").attr("fill", indicator.triangleColorOff);
 
-                  let thisInterval1 = setInterval(function () {
-                      currentFloor += 1;
-                      updateIndicator();
-                      console.log(currentFloor)
-                      if (currentFloor === destination){
-                          clearInterval(thisInterval1);
-                      }
-                  }, 1500)
-                  openDoor(distance * 1500 + 1000)
-              }
+                    let thisInterval1 = setInterval(function () {
+                        currentFloor += 1;
+                        updateIndicator();
+                        console.log(currentFloor)
+                        if (currentFloor === destination){
+                            clearInterval(thisInterval1);
+                        }
+                    }, 1500)
+                    openDoor(distance * 1500 + 1000)
+                }
 
-              else if (currentFloor > destination){ // going down
-                  d3.select("#upSign").attr("fill", indicator.triangleColorOff);
-                  d3.select("#downSign").attr("fill", indicator.triangleColorOn);
+                else if (currentFloor > destination){ // going down
+                    d3.select("#upSign").attr("fill", indicator.triangleColorOff);
+                    d3.select("#downSign").attr("fill", indicator.triangleColorOn);
 
-                  closeDoor()
-                  let thisInterval1 = setInterval(function () {
-                      currentFloor -= 1;
-                      updateIndicator();
-                      console.log(currentFloor)
-                      if (currentFloor === destination){
-                          clearInterval(thisInterval1);
-                      }
-                  }, 1500)
+                    closeDoor()
+                    let thisInterval1 = setInterval(function () {
+                        currentFloor -= 1;
+                        updateIndicator();
+                        console.log(currentFloor)
+                        if (currentFloor === destination){
+                            clearInterval(thisInterval1);
+                        }
+                    }, 1500)
 
-                  openDoor(distance * 1500 + 1000)
-              }
-              
-          });
+                    openDoor(distance * 1500 + 1000)
+                }
+
+            });
     }
 
     function updateIndicator(){
@@ -478,26 +502,29 @@
             .duration(500)
             .attr("y", dotPosition(currentFloor));
     }
- 
+
     function highlightButton(id, time){
+        console.log(id);
         d3.select("#button_" + id).transition().duration(50).attr("fill", button.highlightColor);
         d3.selectAll(".onButton_" + id).transition().duration(100)
             .attr("cx", button.x2)
             .attr("x", button.x2);
-        
-        // d3.selectAll(".onLowerButton_" + id).transition().duration(100)
-        //     .attr("cx", lower.x2)
-        
-        
-        
+
+        d3.selectAll(".onLowerButton_" + id).transition().duration(100)
+            .attr("cx", lower.x2)
+            .attr("x", lower.image.x2);
+
+        // ----------------------------------
+ 
         d3.select("#button_" + id).transition().duration(300).delay(time).attr("fill", button.color);
-        
+
         d3.selectAll(".onButton_" + id).transition().duration(300).delay(time)
             .attr("x", button.x)
             .attr("cx", button.x);
-        
-        // d3.selectAll(".onLowerButton_" + id).transition().duration(300).delay(time)
-        //     .attr("cx", lower.x)
+
+        d3.selectAll(".onLowerButton_" + id).transition().duration(300).delay(time)
+            .attr("cx", lower.x)
+            .attr("x", lower.image.x)
     }
 
 </script>
