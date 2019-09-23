@@ -17,7 +17,7 @@
 <!--<script src="js/main.js"></script>-->
 <script>
     const wallWidth = 600;
-    const wallHeight = 900;
+    const wallHeight = 870;
     const doorWidth = 600;
     const doorHeight = wallHeight;
     const svgWidth = doorWidth + wallWidth;
@@ -418,6 +418,7 @@
         .attr("fill", button.color)
         .attr("width", button.width)
         .attr("height", button.height)
+        .attr("cursor", "pointer")
 
 
     lowerGroup.selectAll(".lowerInfo")
@@ -444,7 +445,8 @@
         .attr("fill-opacity", 0.9)
         .attr("stroke", button.circleStrokeColor)
         .attr("stroke-width", button.strokeWidth)
-        .attr("transform", "translate("+ (button.width - button.circleRadius - 3) + ","+ (button.height/2) +")");
+        .attr("transform", "translate("+ (button.width - button.circleRadius - 3) + ","+ (button.height/2) +")")
+        .attr("cursor", "pointer");
 
     lowerGroup
         .selectAll(".imageLower")
@@ -456,6 +458,7 @@
         .attr('height', lower.imgSize)
         .attr("x", lower.image.x)
         .attr("transform", (d,i) => "translate(0, 45)")
+        .attr("cursor", "pointer")
 
 
     // ────────────────────────── M I S C  ──────────────────────────
