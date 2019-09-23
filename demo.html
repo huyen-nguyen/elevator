@@ -6,6 +6,8 @@
     <script src="lib/d3.v4.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Baloo&display=swap" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+
 
     <link rel="stylesheet" href="styles/main.css">
 
@@ -95,6 +97,11 @@
     const dotPosition = function (i){
         return 240 - 70*i
     }
+    
+    const amberHeight = 50;
+    
+    let amberStatus = "Gold";
+    const amberInfo = ["Gold", "Red"]
 
     let svg = d3.select(main).append("svg")
         .attr("width", svgWidth).attr("height", svgHeight);
@@ -186,9 +193,59 @@
             ((indicator.width)/2 - 10) + ","+ (indicator.barHeight/2 + indicator.textSize/2) +")")
 
 
-    // ────────────────────────────────────────────────────────────────────────
+    // ───────────────────────────────────────────────────────────────
 
-    // ────────────────────────── Main CONTROL PANEL ──────────────────────────
+    // ────────────────────────── Main CONTROL PANEL
+    let lightSVG = wallGroupSVG.append("g")
+        .attr("id", "screengroup")
+        .attr("transform", "translate(150,"+(panelPositionY-200)+")");
+
+    lightSVG.append('image')
+        .attr('xlink:href', 'images/amberGold.jpg')
+        .attr("id", "amber")
+        .attr('height', amberHeight)
+        .attr("transform", "translate(80,30)")
+
+    // ────────────────────────── Upper panel ──────────────────────────
+    let upperPanel = wallGroupSVG.append("g")
+        .attr("id", "screengroup")
+        .attr("transform", "translate(150,"+(panelPositionY-100)+")");
+    
+    upperPanel.append("rect")
+        .attr("width", 300)
+        .attr("height", 70)
+        .attr("fill", "#020829")
+        .attr("transform", "translate(-10,0)")
+    
+    upperPanel.append("text")
+        .attr("id", "clock")
+        .attr("class", "clock")
+        .attr("transform", "translate(0,30)")
+    ;
+
+    upperPanel.append("text")
+        .attr("id", "weather")
+        .attr("class", "weather")
+        .attr("fill", "white")
+        .html('<tspan x = 0 style="font-size: 10px"> inside</tspan>'+
+            '<tspan x = 33 style="font-size: 26px">85°F</tspan>'
+                + '<tspan x = "-1em" dy="3em" style="font-size: 10px">outside</tspan>'+
+            '<tspan x = 33 style="font-size: 26px">90°F</tspan>'
+            )
+        .attr("transform", "translate(180,30)")
+    ;
+
+    setInterval(function(){
+        d3.select("#clock").html(getCurrentTime());
+    }, 1);
+
+    function getCurrentTime() {
+        let formatDay = d3.timeFormat("%B %d, %Y");
+        let formatTime = d3.timeFormat("%I:%M:%S");
+        return '<tspan x = 0>'+formatDay(new Date())+'</tspan>'
+            +
+            '<tspan x = 0 dy="1.4em">'+formatTime(new Date())+'</tspan>'; // "June 30, 2015"
+    }
 
     // ────────────────────────── Screen  ──────────────────────────
 
@@ -414,6 +471,14 @@
         .attr('xlink:href', 'images/AlarmBottom.png')
         .attr('height', 50)
         .attr("transform", "translate(300, 30)")
+        .on("click", function () {
+            setInterval(function () {
+                if (amberStatus === "Gold") amberStatus = "Red"
+                else amberStatus = "Gold"
+                d3.select("#amber")
+                    .attr('xlink:href', 'images/amber' + amberStatus +'.jpg')
+            }, 500)
+        })
     ;
 
     // ────────────────────────── I N T E R A C T I O N  ──────────────────────────

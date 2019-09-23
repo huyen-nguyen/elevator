@@ -1,6 +1,13 @@
 text {
     font-family: Verdana;
 }
+
+@font-face {
+    font-family: 'digital-7';
+    src: url('./fonts/digital-7.ttf');
+}
+
+
 /* Indicator */
 .arrow-up {
     width: 0;
@@ -25,4 +32,10 @@ text {
     font-family: 'Press Start 2P', cursive;
     font-weight : bold;
     /*pointer-events: none;*/
+}
+
+.clock{
+    font-family: 'digital-7', sans-serif;
+    fill: white;
+    font-size: 20px;
 }
