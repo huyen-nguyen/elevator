@@ -467,17 +467,29 @@
         .attr('height', 100)
         .attr("transform", "translate(150, 5)")
 
+    let toggleL = true;
+    let lightID;
     bottomGroup.append('image')
         .attr('xlink:href', 'images/AlarmBottom.png')
         .attr('height', 50)
         .attr("transform", "translate(300, 30)")
         .on("click", function () {
-            setInterval(function () {
-                if (amberStatus === "Gold") amberStatus = "Red"
-                else amberStatus = "Gold"
+            if (toggleL){
+                lightID = setInterval(function () {
+                    if (amberStatus === "Gold") amberStatus = "Red"
+                    else amberStatus = "Gold"
+                    d3.select("#amber")
+                        .attr('xlink:href', 'images/amber' + amberStatus +'.jpg')
+                }, 200);
+                toggleL =  false;
+            }
+            else {
+                clearInterval(lightID);
                 d3.select("#amber")
-                    .attr('xlink:href', 'images/amber' + amberStatus +'.jpg')
-            }, 500)
+                    .attr('xlink:href', 'images/amber' + "Gold" +'.jpg')
+                toggleL = true;
+            }
+            
         })
     ;
 
