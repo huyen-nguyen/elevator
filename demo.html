@@ -508,6 +508,10 @@
 
     d3.select("#button_Alarm")
         .on("click", function () {
+            clearInterval(lightID);
+            d3.select("#amber")
+                .attr('xlink:href', 'images/amber' + "Gold" +'.jpg')
+            toggleL = true;
             highlightButton("Alarm", 1500)
         })
 
